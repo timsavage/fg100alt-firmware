@@ -4,11 +4,12 @@
 MCU = atmega328p
 
 # Project name
-PROJECTNAME	= fg100alt
+PROJECTNAME = fg100alt
 
 # MCU Clock frequency
-CLK_FREQ = 16000000L
-#CLK_FREQ = 20000000L
+CLK_FREQ = 16000000UL
+# CLK_FREQ =  1000000UL
+# CLK_FREQ = 20000000UL
 
 # Source files
 SRC = main.c
@@ -21,7 +22,7 @@ LIBS =
 
 # Optimization
 # use s (size opt), 1, 2, 3 or 0 (off)
-OPTIMIZE = 2
+OPTIMIZE = 1
 
 # AVR Dude programmer
 AVRDUDE_PROGRAMMER = usbtiny
@@ -88,7 +89,7 @@ install: upload
 
 # Linking
 $(TRG): $(OBJS) 
-	$(CC) $(LDFLAGS) -o $(TRG) $(OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $(TRG) $(OBJS)
 
 # Generate object files
 %.c.o: %.c
