@@ -20,14 +20,12 @@ unsigned char sineWave[256] = {
 	 79,  82,  85,  88,  91,  94,  97, 100, 103, 106, 109, 112, 115, 118, 121, 124 
 };
 
-unsigned char ramp[256] = {
+// unsigned char ramp[256] = {};
 
-};
+// unsigned char sawToothWave[256] = {};
 
-unsigned char sawToothWave[256] = {};
+// unsigned char triangularWave[256] = {};
 
-unsigned char triangularWave[256] = {};
-
-unsigned char ecgWave[256] = {};
+// unsigned char ecgWave[256] = {};
 
 #endif // !WAVEFORMS__H_

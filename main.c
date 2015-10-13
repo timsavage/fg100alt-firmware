@@ -27,7 +27,7 @@ void init(void) {
 
 unsigned char counter = 0;
 
-void generate_dds() {
+void generate_dds(void) {
 	DAC = sineWave[(counter++) & 0xFF];
 }
 
