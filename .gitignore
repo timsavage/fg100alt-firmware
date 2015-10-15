@@ -3,3 +3,9 @@ build/
 *.hex
 *.out
 *.map
+
+# Eclipse fluff
+.metadata
+.project
+.cproject
+.settings
