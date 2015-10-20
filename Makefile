@@ -7,12 +7,13 @@ MCU = atmega328p
 PROJECTNAME = fg100alt
 
 # MCU Clock frequency
-CLK_FREQ = 16000000UL
+# CLK_FREQ = 20000000UL
+CLK_FREQ = 20000000UL
 # CLK_FREQ =  1000000UL
 # CLK_FREQ = 20000000UL
 
 # Source files
-SRC = main.c
+SRC = main.c gen_asm.S
 
 # Additional include paths
 INCLUDES =
@@ -40,7 +41,7 @@ override CFLAGS = -I. $(INCLUDES) -g -O$(OPTIMIZE) -mmcu=$(MCU) \
 override ASMFLAGS = -I. $(INCLUDES) -mmcu=$(MCU)
 
 # Linker
-override LDFLAGS = -Wl,-Map,$(TRG).map
+override LDFLAGS = -Wl,-Map,$(TRG).map $(CFLAGS)
 
 
 #### Executables
@@ -96,7 +97,7 @@ $(TRG): $(OBJS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 %.S.o: %.S
-	$(CC) S(ASMFLAGS) -c $< -o $@
+	$(CC) $(ASMFLAGS) -c $< -o $@
 
 # Generate hex
 %.hex: %.out
