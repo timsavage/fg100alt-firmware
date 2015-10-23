@@ -13,7 +13,7 @@ CLK_FREQ = 20000000UL
 # CLK_FREQ = 20000000UL
 
 # Source files
-SRC = src/main.c src/lcd.c src/dac.c src/dac.S
+SRC = main.c lcd.c dac.c dac.S
 
 # Additional include paths
 INCLUDES =
@@ -93,10 +93,10 @@ $(TRG): $(OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $(TRG) $(OBJS)
 
 # Generate object files
-%.c.o: %.c
+%.c.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-%.S.o: %.S
+%.S.o: src/%.S
 	$(CC) $(ASMFLAGS) -c $< -o $@
 
 # Generate hex
