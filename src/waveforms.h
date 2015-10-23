@@ -1,5 +1,12 @@
-#ifndef WAVEFORMS__H_
-#define WAVEFORMS__H_
+/*
+ * waveforms.h
+ *
+ *  Created on:
+ *      Author: tims
+ */
+
+#ifndef WAVEFORMS_H_
+#define WAVEFORMS_H_
 
 uint8_t waves[][256] = {
 	// Sign Wave
@@ -104,4 +111,4 @@ uint8_t waves[][256] = {
 // char* waveNames[6] = {"Sign", "Triangle", "Sawtooth", "R Sawtooth", "Square", "ECG"};
 
 
-#endif // !WAVEFORMS__H_
+#endif /* WAVEFORMS_H_ */

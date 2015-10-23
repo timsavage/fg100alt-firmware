@@ -2,8 +2,8 @@
 
 .section	.text
 
-; extern void asmloop(uint32_t step, uint8_t* waveform);
-.global 	asmloop
+; extern void ddsloop(uint32_t step, uint8_t* waveform);
+.global 	ddsloop
 
 #define I 		r17
 #define FIX_L 	r18
@@ -16,7 +16,7 @@
 #define WAVEFORM_H	r21
 #define WAVEFORM_L	r20
 
-asmloop:
+ddsloop:
 	clr		I
 	clr		FIX_L
 	clr		FIX_H

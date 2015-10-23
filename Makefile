@@ -7,13 +7,13 @@ MCU = atmega328p
 PROJECTNAME = fg100alt
 
 # MCU Clock frequency
-# CLK_FREQ = 20000000UL
+# CLK_FREQ = 30000000UL
 CLK_FREQ = 20000000UL
 # CLK_FREQ =  1000000UL
 # CLK_FREQ = 20000000UL
 
 # Source files
-SRC = main.c gen_asm.S
+SRC = src/main.c src/lcd.c src/dac.c src/dac.S
 
 # Additional include paths
 INCLUDES =
