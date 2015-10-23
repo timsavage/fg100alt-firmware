@@ -1,8 +1,7 @@
 /*
  * lcd.h
  *
- *  Created on: 22 Oct 2015
- *      Author: tims
+ *  Based on code by aostanin - https://github.com/aostanin/avr-hd44780
  */
 
 #ifndef LCD_H_

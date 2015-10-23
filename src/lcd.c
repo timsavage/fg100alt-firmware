@@ -1,8 +1,7 @@
 /*
  * lcd.c
  *
- *  Created on: 22 Oct 2015
- *      Author: tims
+ *  Based on code by aostanin - https://github.com/aostanin/avr-hd44780
  */
 
 #include <stdarg.h>
