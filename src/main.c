@@ -32,10 +32,12 @@ void update_lcd() {
 int main(void) {
 	init();
 
+	dac_set_freq(500);
+	dac_set_waveform(waves[0]);
+
 	_delay_ms(5000);
 
 	update_lcd();
-	dac_set_waveform(waves[0]);
 	dac_start();
 
 	return 1;
