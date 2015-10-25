@@ -168,14 +168,14 @@ void lcd_set_cursor(uint8_t col, uint8_t row) {
   lcd_command(LCD_SETDDRAMADDR | (col + offsets[row]));
 }
 
-void lcd_puts(char *string) {
-	char* it;
+void lcd_puts(const char* string) {
+	const char* it;
 	for (it = string; *it; it++) {
     	lcd_write(*it);
 	}
 }
 
-void lcd_printf(char *format, ...) {
+void lcd_printf(const char* format, ...) {
   va_list args;
 
   va_start(args, format);

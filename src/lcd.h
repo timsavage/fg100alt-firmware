@@ -81,9 +81,9 @@ void lcd_set_right_to_left(void);
 void lcd_enable_autoscroll(void);
 void lcd_disable_autoscroll(void);
 
-void lcd_create_char(uint8_t location, uint8_t *charmap);
+void lcd_create_char(uint8_t location, uint8_t* charmap);
 
-void lcd_puts(char *string);
-void lcd_printf(char *format, ...);
+void lcd_puts(const char *string);
+void lcd_printf(const char *format, ...);
 
 #endif /* LCD_H_ */
