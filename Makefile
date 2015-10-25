@@ -90,7 +90,10 @@ hex: $(HEXTRG)
 upload: hex
 	$(AVRDUDE) -c $(AVRDUDE_PROGRAMMER) -p $(MCU) -U flash:w:$(HEXROMTRG)
 
-install: upload
+fuses: 
+	$(AVRDUDE) -c $(AVRDUDE_PROGRAMMER) -p $(MCU) -U lfuse:w:0xf7:m -U hfuse:w:0xd9:m
+
+install: fuses upload
 
 # Linking
 $(TRG): $(OBJS) 
