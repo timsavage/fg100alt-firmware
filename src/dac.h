@@ -60,18 +60,6 @@ void dac_init(void);
 /**
  * Start/break DDS waveform generation
  */
-void dac_start(void);
-void dac_break(void);
-
-/**
- * Set waveform
- */
-void dac_set_waveform(uint8_t* waveform);
-
-/**
- * Frequency control
- */
-void dac_set_freq(uint32_t freq);
-uint32_t dac_get_freq(void);
+void dac_start(uint8_t* waveform, uint32_t frequency);
 
 #endif /* SRC_DAC_H_ */

@@ -1,4 +1,5 @@
 #include <util/delay.h>
+#include <avr/interrupt.h>
 #include <avr/wdt.h>
 #include <math.h>
 
@@ -26,6 +27,11 @@ void init(void) {
 
 	// Configure strobe pin
 	DDRB = DDRB & ~_BV(BUTTON_STROBE);
+
+	// Configure interrupt for Start/Stop button
+	DDRC &= ~_BV(PINC3);
+	PCMSK1 |= _BV(PCINT11);  // Enable Pin change interrupts on PCI1 for pin 27
+	PCICR |= _BV(PCIE1);  // Enable Pin Change interrupt 1
 }
 
 /**
@@ -63,9 +69,6 @@ void generate_ui_events() {
 int main(void) {
 	init();
 
-	dac_set_freq(500);
-	dac_set_waveform(waves[0]);
-
 	_delay_ms(2000);
 
 	ui_redraw_display(&g_state);
@@ -77,8 +80,15 @@ int main(void) {
 void loop(void) {
 	while(1) {
 		generate_ui_events();
+
+		if (SPCR) {
+			dac_start(waves[g_state.function], g_state.frequency);
+		}
 	}
+}
 
-	//	dac_start();
-
+ISR(PCINT1_vect)
+{
+	SPCR = !SPCR & 1;
+	lcd_printf("%d", SPCR);
 }
