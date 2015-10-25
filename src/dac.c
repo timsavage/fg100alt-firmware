@@ -19,7 +19,7 @@ void dac_init(void) {
 
 void dac_start(void) {
 	if (dac_waveform == 0) return;
-	uint32_t step = (dac_frequency * DAC_STEP) + 0.5;
+	uint32_t step = (dac_frequency * DAC_STEP_CONSTANT) + 0.5;
 	ddsloop(step, dac_waveform);
 }
 
