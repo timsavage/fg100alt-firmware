@@ -6,14 +6,11 @@
 #include "waveforms.h"
 
 #include "lcd.h"
+#include "ui.h"
 #include "dac.h"
 
-const uint8_t c_lcdMode    = 0b00111110;
-const uint8_t c_buttonMode = 0b00000010;
-
-uint8_t g_function = 0;
-uint8_t g_adjustOffset = 3;
-uint32_t g_freq = 500;
+State g_state = {500, 2, 0};
+uint8_t g_buttonStatus[BUTTON_COUNT];
 
 int main(void);
 void loop(void);
@@ -23,10 +20,7 @@ void init(void) {
 
 	// Initialize the LCD and display splash message
 	lcd_init();
-	lcd_clear();
-	lcd_puts("FG-100 Alt  v0.1");
-	lcd_set_cursor(1, 1);
-	lcd_puts("savage.company");
+	ui_show_splash();
 
 	dac_init();
 
@@ -34,54 +28,36 @@ void init(void) {
 	DDRB = DDRB & ~_BV(BUTTON_STROBE);
 }
 
-void update_lcd() {
-	lcd_clear();
-	lcd_printf("Wave: Sign");
-	lcd_set_cursor(0, 1);
-	lcd_printf("Freq: %06uHz", g_freq);
-	if (g_adjustOffset >= 0) {
-		lcd_set_cursor(12 - g_adjustOffset, 1);
-		lcd_enable_blinking();
-		lcd_enable_cursor();
-	} else {
-		lcd_disable_blinking();
-		lcd_disable_cursor();
-	}
-}
-
-uint8_t check_button(uint8_t pin) {
-	_delay_ms(50);
+/**
+ * Check the status of a button and raise events
+ */
+void raise_button_events(uint8_t pin, uint8_t button) {
 	PORTB = (PORTB & 0xFF & ~(0x0F << PORTB2)) | _BV(pin);
 	_delay_ms(10);
-	return PINB & _BV(PINB1);
+
+	if (PINB & _BV(BUTTON_STROBE)) {
+		if (g_buttonStatus[button]) {
+			ui_handle_event(button, BUTTON_REPEAT, &g_state);
+		} else {
+			ui_handle_event(button, BUTTON_PRESS, &g_state);
+		}
+		g_buttonStatus[button] = BUTTON_DOWN;
+	} else {
+		if (g_buttonStatus[button]) {
+			ui_handle_event(button, BUTTON_RELEASE, &g_state);
+		}
+		g_buttonStatus[button] = BUTTON_UP;
+	}
+	_delay_ms(10);
 }
 
-void handle_buttons() {
-	uint8_t changed = 0;
 
-	if (check_button(MODE_PIN)) {
-		g_function = (g_function + 1) % 5;
-		changed = 1;
-	}
-
-	if (check_button(CURSOR_PIN)) {
-		g_adjustOffset = (g_adjustOffset + 1) % 6;
-		changed = 1;
-	}
-
-	if (check_button(PLUS_PIN)) {
-		g_freq += (10 ^ g_adjustOffset);
-		changed = 1;
-	}
-
-	if (check_button(MINUS_PIN)) {
-		g_freq -= (10 ^ g_adjustOffset);
-		changed = 1;
-	}
-
-	if (changed) {
-		update_lcd();
-	}
+void generate_ui_events() {
+	raise_button_events(MODE_PIN, MODE_BUTTON);
+	raise_button_events(CURSOR_PIN, CURSOR_BUTTON);
+	raise_button_events(PLUS_PIN, PLUS_BUTTON);
+	raise_button_events(MINUS_PIN, MINUS_BUTTON);
+	_delay_ms(50);
 }
 
 int main(void) {
@@ -92,7 +68,7 @@ int main(void) {
 
 	_delay_ms(2000);
 
-	update_lcd();
+	ui_redraw_display(&g_state);
 	loop();
 
 	return 1;
@@ -100,7 +76,7 @@ int main(void) {
 
 void loop(void) {
 	while(1) {
-		handle_buttons();
+		generate_ui_events();
 	}
 
 	//	dac_start();
