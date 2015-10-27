@@ -10,13 +10,13 @@
 
 #include "lcd.h"
 
+#define BUFFER_SIZE 17
+
+static uint8_t lcd_displayparams;
+static char lcd_buffer[BUFFER_SIZE];
 
 void lcd_send(uint8_t value, uint8_t mode);
 void lcd_write_nibble(uint8_t nibble);
-
-static uint8_t lcd_displayparams;
-#define BUFFER_SIZE 17
-static char lcd_buffer[BUFFER_SIZE];
 
 void lcd_command(uint8_t command) {
 	lcd_send(command, 0);
@@ -37,11 +37,10 @@ void lcd_send(uint8_t value, uint8_t mode) {
 }
 
 void lcd_write_nibble(uint8_t nibble) {
+	// Bits need to be inverted as the data lines are in reverse order
 	nibble = (
-		(nibble & 1) << 3 |
-		(nibble & 2) << 1 |
-		(nibble & 4) >> 1 |
-		(nibble & 8) >> 3
+		(nibble & 1) << 3 | (nibble & 2) << 1 |
+		(nibble & 4) >> 1 | (nibble & 8) >> 3
 	);
 	LCD_DATA_PORT = (LCD_DATA_PORT & 0xFF & ~(0x0F << LCD_LOW_BYTE)) | ((nibble & 0x0F) << LCD_LOW_BYTE);
 
