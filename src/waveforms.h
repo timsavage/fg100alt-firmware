@@ -5,10 +5,12 @@
  *      Author: tims
  */
 
+#include <avr/pgmspace.h>
+
 #ifndef WAVEFORMS_H_
 #define WAVEFORMS_H_
 
-uint8_t waves[][256] = {
+const uint8_t waves[][256] PROGMEM = {
 	// Sign Wave
 	{
 		127, 130, 133, 136, 139, 143, 146, 149, 152, 155, 158, 161, 164, 167, 170, 173,
@@ -105,10 +107,5 @@ uint8_t waves[][256] = {
 		  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
 	}
 };
-
-// uint8_t ecgWave[256] = {};
-
-// char* waveNames[6] = {"Sign", "Triangle", "Sawtooth", "R Sawtooth", "Square", "ECG"};
-
 
 #endif /* WAVEFORMS_H_ */
