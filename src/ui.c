@@ -28,10 +28,8 @@ void ui_redraw_display(State* state) {
 	lcd_printf("Freq: %06uHz", state->frequency);
 	if (state->frequencyOffset >= 0) {
 		lcd_set_cursor(11 - state->frequencyOffset, 1);
-		lcd_enable_blinking();
 		lcd_enable_cursor();
 	} else {
-		lcd_disable_blinking();
 		lcd_disable_cursor();
 	}
 }

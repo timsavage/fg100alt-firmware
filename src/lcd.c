@@ -102,23 +102,13 @@ void lcd_return_home(void) {
   _delay_ms(2);
 }
 
-void lcd_enable_blinking(void) {
-  lcd_displayparams |= LCD_BLINKON;
-  lcd_command(LCD_DISPLAYCONTROL | lcd_displayparams);
-}
-
-void lcd_disable_blinking(void) {
-  lcd_displayparams &= ~LCD_BLINKON;
-  lcd_command(LCD_DISPLAYCONTROL | lcd_displayparams);
-}
-
 void lcd_enable_cursor(void) {
-  lcd_displayparams |= LCD_CURSORON;
+  lcd_displayparams |= LCD_CURSORON | LCD_BLINKON;
   lcd_command(LCD_DISPLAYCONTROL | lcd_displayparams);
 }
 
 void lcd_disable_cursor(void) {
-  lcd_displayparams &= ~LCD_CURSORON;
+  lcd_displayparams &= ~(LCD_CURSORON | LCD_BLINKON);
   lcd_command(LCD_DISPLAYCONTROL | lcd_displayparams);
 }
 

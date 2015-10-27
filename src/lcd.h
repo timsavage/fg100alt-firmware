@@ -65,11 +65,9 @@ void lcd_write(uint8_t value);
 void lcd_clear(void);
 void lcd_return_home(void);
 
-void lcd_enable_blinking(void);
-void lcd_disable_blinking(void);
-
 void lcd_enable_cursor(void);
 void lcd_disable_cursor(void);
+
 void lcd_set_cursor(uint8_t col, uint8_t row);
 
 void lcd_scroll_left(void);
