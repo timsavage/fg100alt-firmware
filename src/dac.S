@@ -30,5 +30,7 @@ loop:
 	adc		r30, STEP_2				; 1 clock
 	ld		I, Z					; 2 clocks
 	out		_SFR_IO_ADDR(PORTD), I	; 1 clock
+	sbic    _SFR_IO_ADDR(GPIOR0), GPIOR00	; 1 clock (if unset)
 	rjmp	loop					; 2 clocks
-									; = 8 clocks
+	ret								; --------
+									; 9 clocks

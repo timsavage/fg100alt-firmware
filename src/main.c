@@ -10,6 +10,7 @@
 #include "ui.h"
 #include "dac.h"
 
+uint8_t waveBuffer[256] __attribute__ ((section (".WaveBuffer")));
 State g_state = {500, 2, 0};
 uint8_t g_buttonStatus[BUTTON_COUNT];
 
@@ -29,9 +30,12 @@ void init(void) {
 	DDRB = DDRB & ~_BV(BUTTON_STROBE);
 
 	// Configure interrupt for Start/Stop button
-	DDRC &= ~_BV(PINC3);
+	DDRC   &= ~_BV(PINC3);
+	PORTC  |= _BV(PINC3);  // Enable pull up resistor
 	PCMSK1 |= _BV(PCINT11);  // Enable Pin change interrupts on PCI1 for pin 27
-	PCICR |= _BV(PCIE1);  // Enable Pin Change interrupt 1
+
+	// Enable interrupts
+	sei();
 }
 
 /**
@@ -63,7 +67,6 @@ void generate_ui_events() {
 	raise_button_events(CURSOR_PIN, CURSOR_BUTTON);
 	raise_button_events(PLUS_PIN, PLUS_BUTTON);
 	raise_button_events(MINUS_PIN, MINUS_BUTTON);
-	_delay_ms(50);
 }
 
 int main(void) {
@@ -81,14 +84,30 @@ void loop(void) {
 	while(1) {
 		generate_ui_events();
 
-		if (SPCR) {
-			dac_start(waves[g_state.function], g_state.frequency);
+		if (!(PINC & _BV(RUN_STOP_PIN))) {
+			// Populate wave buffer
+			memcpy_P(waveBuffer, waves[g_state.function], 256);
+
+			lcd_disable_cursor();
+
+			DAC_ENABLE;
+			PCICR |= _BV(PCIE1);  // Enable Pin Change interrupt 1
+
+			dac_start(waveBuffer, g_state.frequency);
+
+			lcd_enable_cursor();
 		}
+
+		_delay_ms(50);
 	}
 }
 
 ISR(PCINT1_vect)
 {
-	SPCR = !SPCR & 1;
-	lcd_printf("%d", SPCR);
+	cli();
+	if (!(PINC & _BV(RUN_STOP_PIN))) {
+		PCICR &= ~_BV(PCIE1);  // Disable Pin Change interrupt 1
+		DAC_DISABLE;
+	}
+	sei();
 }
