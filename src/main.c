@@ -8,9 +8,8 @@
 
 #include "lcd.h"
 #include "ui.h"
-#include "dac.h"
+#include "dds.h"
 
-uint8_t waveBuffer[256] __attribute__ ((section (".WaveBuffer")));
 State g_state = {500, 2, 0};
 uint8_t g_buttonStatus[BUTTON_COUNT];
 
@@ -85,15 +84,14 @@ void loop(void) {
 		generate_ui_events();
 
 		if (!(PINC & _BV(RUN_STOP_PIN))) {
-			// Populate wave buffer
-			memcpy_P(waveBuffer, waves[g_state.function], 256);
+			dds_select_wave(g_state.function);
 
 			lcd_disable_cursor();
 
 			DAC_ENABLE;
 			PCICR |= _BV(PCIE1);  // Enable Pin Change interrupt 1
 
-			dac_start(waveBuffer, g_state.frequency);
+			dds_start(g_state.frequency);
 
 			lcd_enable_cursor();
 		}
