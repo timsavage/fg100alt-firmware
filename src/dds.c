@@ -115,19 +115,19 @@ const uint8_t wave_table[][256] PROGMEM = {
 
 void dds_init(void) {
 	// Set DAC port to output
-	DAC_DDR = 0xFF;  // Enable all output pins on PORTD
-	DAC_PORT = 0x7F;  // Set output to the middle (is offset to 0)
-	DAC_DISABLE;
+	DDS_DDR = 0xFF;  // Enable all output pins on PORTD
+	DDS_PORT = 0x7F;  // Set output to the middle (is offset to 0)
+	DDS_DISABLE;
 }
 
 void dds_select_wave(uint8_t wave_idx) {
-	memcpy_P(wave_buffer, wave_table[g_state.function], 256);
+	memcpy_P(wave_buffer, wave_table[wave_idx], 256);
 }
 
-void dac_start(uint32_t frequency) {
-	uint32_t step = (frequency * DAC_STEP_CONSTANT) + 0.5;
-	DAC_ENABLE;
+void dds_start(uint32_t frequency) {
+	uint32_t step = (frequency * DDS_STEP_CONSTANT) + 0.5;
+	DDS_ENABLE;
 	ddsloop(step, wave_buffer);
-	DAC_DISABLE;
-	DAC_PORT = 0x7F;
+	DDS_DISABLE;
+	DDS_PORT = 0x7F;
 }

@@ -4,7 +4,6 @@
 #include <math.h>
 
 #include "defines.h"
-#include "waveforms.h"
 
 #include "lcd.h"
 #include "ui.h"
@@ -23,7 +22,7 @@ void init(void) {
 	lcd_init();
 	ui_show_splash();
 
-	dac_init();
+	dds_init();
 
 	// Configure strobe pin
 	DDRB = DDRB & ~_BV(BUTTON_STROBE);
@@ -88,7 +87,7 @@ void loop(void) {
 
 			lcd_disable_cursor();
 
-			DAC_ENABLE;
+			DDS_ENABLE;
 			PCICR |= _BV(PCIE1);  // Enable Pin Change interrupt 1
 
 			dds_start(g_state.frequency);
@@ -105,7 +104,7 @@ ISR(PCINT1_vect)
 	cli();
 	if (!(PINC & _BV(RUN_STOP_PIN))) {
 		PCICR &= ~_BV(PCIE1);  // Disable Pin Change interrupt 1
-		DAC_DISABLE;
+		DDS_DISABLE;
 	}
 	sei();
 }

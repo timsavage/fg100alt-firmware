@@ -63,17 +63,17 @@
 
 // Minimum frequency
 #ifndef DDS_MIN_FREQ
-#define 1
+#define DDS_MIN_FREQ 1
 #endif
 
 // Maximum frequency (supported by hardware), default is 1Mhz
 #ifndef DDS_MAX_FREQ
-#define 1000000
+#define DDS_MAX_FREQ 1000000
 #endif
 
 // Check that the DDS is enabled
 #define DDS_IS_ENABLED 	((DDS_BREAK_REGISTER >> DDS_BREAK_BIT) & 1)
-#define DDS_ENABLE 		DDS_BREAK_REGISTER |= _BV(DSA_BREAK_BIT)
+#define DDS_ENABLE 		DDS_BREAK_REGISTER |= _BV(DDS_BREAK_BIT)
 #define DDS_DISABLE 	DDS_BREAK_REGISTER &= ~_BV(DDS_BREAK_BIT)
 #define DDS_TOGGLE		DDS_BREAK_REGISTER ^= _BV(DDS_BREAK_BIT)
 

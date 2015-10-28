@@ -11,11 +11,11 @@ CLK_FREQ = 30000000UL
 #CLK_FREQ = 20000000UL
 
 # DAC step constant
-DAC_STEP_CONSTANT = 5.0331648
-#DAC_STEP_CONSTANT = 7.5497472
+DDS_STEP_CONSTANT = 5.0331648
+#DDS_STEP_CONSTANT = 7.5497472
 
 # Source files
-SRC = main.c lcd.c ui.c dac.c dac.S
+SRC = main.c lcd.c ui.c dds.c dds.S
 
 # Additional include paths
 INCLUDES =
@@ -37,7 +37,7 @@ AVRDUDE_PROGRAMMER = usbtiny
 
 # Compiler
 override CFLAGS = -I. $(INCLUDES) -g -O$(OPTIMIZE) -mmcu=$(MCU) \
-		-DF_CPU=$(CLK_FREQ) -DDAC_STEP_CONSTANT=$(DAC_STEP_CONSTANT) \
+		-DF_CPU=$(CLK_FREQ) -DDDS_STEP_CONSTANT=$(DDS_STEP_CONSTANT) \
 		-Wall -Werror -Wl,-section-start=.WaveBuffer=0x00800300 \
 		-pedantic -pedantic-errors -std=gnu99 \
 		-fpack-struct -fshort-enums -funsigned-char -funsigned-bitfields -ffunction-sections
