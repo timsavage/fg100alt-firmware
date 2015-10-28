@@ -31,7 +31,7 @@ loop:
 	adc		r30, STEP_2				; 1 clock
 	ld		I, Z					; 2 clocks
 	out		_SFR_IO_ADDR(DDS_PORT), I	; 1 clock
-	sbic    _SFR_IO_ADDR(DDS_BREAK_REGISTER), DDS_BREAK_BIT	; 1 clock (if unset)
+	sbic	_SFR_IO_ADDR(PINC), PINC3	; 1 clock (if unset)
 	rjmp	loop					; 2 clocks
 	ret								; --------
 									; 9 clocks

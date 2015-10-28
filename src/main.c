@@ -24,7 +24,6 @@ void init(void) {
 	// Configure interrupt for Start/Stop button
 	DDRC  &= ~_BV(PINC3);
 	PORTC |= _BV(PINC3);  // Enable pull up resistor
-	PCICR |= _BV(PCIE1);  // Enable Pin Change interrupt 1
 
 	// Enable interrupts
 	sei();
@@ -62,11 +61,11 @@ void check_strobe_pin(uint8_t button, uint8_t pin) {
  * Generate UI events
  */
 void generate_ui_events() {
+	process_button_event(RUN_STOP_BUTTON, !(PINC & _BV(RUN_STOP_PIN)));
 	check_strobe_pin(MODE_BUTTON, MODE_PIN);
 	check_strobe_pin(CURSOR_BUTTON, CURSOR_PIN);
 	check_strobe_pin(PLUS_BUTTON, PLUS_PIN);
 	check_strobe_pin(MINUS_BUTTON, MINUS_PIN);
-	process_button_event(RUN_STOP_BUTTON, !(PINC & _BV(RUN_STOP_PIN)));
 	_delay_ms(50);
 }
 
@@ -76,13 +75,9 @@ void loop(void) {
 
 		if (DDS_IS_ENABLED) {
 			lcd_disable_cursor();
-			PCMSK1 = _BV(PCINT11);  // Enable Pin change interrupts on PCI1 for pin 27
-
 			dds_start(ui_state.frequency);
-
-			PCMSK1 = 0;  // Disable Pin change interrupts on PCI1 for pin 27
 			lcd_enable_cursor();
-			_delay_ms(10);
+			DDS_DISABLE;
 		}
 	}
 }
@@ -94,15 +89,4 @@ int main(void) {
 
 	loop();
 	return 1;
-}
-
-ISR(PCINT1_vect, ISR_NAKED)
-{
-	asm volatile(
-		"cli" "\n\t"
-		"sbis	0x06, 3" "\n\t"
-		"sbi	0x1E, 0" "\n\t"
-		"sei" "\n\t"
-		"reti" "\n\t"::
-	);
 }

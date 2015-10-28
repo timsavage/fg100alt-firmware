@@ -1,12 +1,12 @@
 /*
- * pinouts.h
+ * defines.h
  *
  *  Created on: 21 Oct 2015
  *      Author: tims
  */
 
-#ifndef PINOUTS_H_
-#define PINOUTS_H_
+#ifndef DEFINES_H_
+#define DEFINES_H_
 
 #include <avr/io.h>
 
@@ -63,4 +63,4 @@
 #define BUTTON_REPEAT	2
 #define BUTTON_RELEASE	3
 
-#endif /* PINOUTS_H_ */
+#endif /* DEFINES_H_ */
