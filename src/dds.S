@@ -1,4 +1,5 @@
 #include <avr/io.h>
+#include "dds_defines.h"
 
 .section	.text
 
@@ -29,8 +30,8 @@ loop:
 	adc		FIX_H, STEP_1			; 1 clock
 	adc		r30, STEP_2				; 1 clock
 	ld		I, Z					; 2 clocks
-	out		_SFR_IO_ADDR(PORTD), I	; 1 clock
-	sbic    _SFR_IO_ADDR(GPIOR0), GPIOR00	; 1 clock (if unset)
+	out		_SFR_IO_ADDR(DDS_PORT), I	; 1 clock
+	sbic    _SFR_IO_ADDR(DDS_BREAK_REGISTER), DDS_BREAK_BIT	; 1 clock (if unset)
 	rjmp	loop					; 2 clocks
 	ret								; --------
 									; 9 clocks

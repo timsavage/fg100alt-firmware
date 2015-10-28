@@ -13,6 +13,15 @@ uint8_t wave_buffer[256] __attribute__ ((section (".WaveBuffer")));
 
 extern void ddsloop(uint32_t step, uint8_t* waveform);
 
+// DDS wave names
+const char* dds_wave_names[] = {
+	"Sign",
+	"Triangle",
+	"Sawtooth",
+	"R Sawtooth",
+	"Square"
+};
+
 // DDS wave tables
 const uint8_t wave_table[][256] PROGMEM = {
 	// Sign Wave
