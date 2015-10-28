@@ -28,9 +28,9 @@ void ui_redraw_display() {
 	lcd_clear();
 	lcd_printf("Wave: %s", dds_wave_names[ui_state.wave_form]);
 	lcd_set_cursor(0, 1);
-	lcd_printf("Freq: %06uHz", ui_state.frequency);
+	lcd_printf("Freq: %05uHz", ui_state.frequency);
 	if (ui_state.frequency_offset >= 0) {
-		lcd_set_cursor(11 - ui_state.frequency_offset, 1);
+		lcd_set_cursor(10 - ui_state.frequency_offset, 1);
 		lcd_enable_cursor();
 	} else {
 		lcd_disable_cursor();
@@ -50,24 +50,28 @@ void ui_handle_event(uint8_t interface, uint8_t event) {
 
 	case CURSOR_BUTTON:
 		if (event == BUTTON_PRESS) {
-			ui_state.frequency_offset = (ui_state.frequency_offset + 1) % 6;
+			ui_state.frequency_offset = (ui_state.frequency_offset + 1) % 5;
 			changed = 1;
 		}
 		break;
 
 	case PLUS_BUTTON:
 		if ((event == BUTTON_PRESS) | (event == BUTTON_REPEAT)) {
-			ui_state.frequency += powersOfTen[ui_state.frequency_offset];
-			changed = 1;
+			uint32_t frequency = ui_state.frequency + powersOfTen[ui_state.frequency_offset];
+			if (DDS_FREQ_IN_RANGE(frequency)) {
+				ui_state.frequency = frequency;
+				changed = 1;
+			}
 		}
 		break;
 
 	case MINUS_BUTTON:
 		if ((event == BUTTON_PRESS) | (event == BUTTON_REPEAT)) {
-
-			ui_state.frequency -= powersOfTen[ui_state.frequency_offset];
-
-			changed = 1;
+			uint32_t frequency = ui_state.frequency - powersOfTen[ui_state.frequency_offset];
+			if (DDS_FREQ_IN_RANGE(frequency)) {
+				ui_state.frequency = frequency;
+				changed = 1;
+			}
 		}
 		break;
 

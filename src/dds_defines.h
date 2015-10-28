@@ -64,10 +64,13 @@
 #define DDS_MIN_FREQ 1
 #endif
 
-// Maximum frequency (supported by hardware), default is 1Mhz
+// Maximum frequency (supported by hardware), default is 500kHz
 #ifndef DDS_MAX_FREQ
-#define DDS_MAX_FREQ 1000000
+#define DDS_MAX_FREQ 500000
 #endif
+
+// Check if frequency is in DDS range
+#define DDS_FREQ_IN_RANGE(freq)	((freq <= DDS_MAX_FREQ) & (freq >= DDS_MIN_FREQ))
 
 // Waveforms
 #define DDS_SIGN_WAVE 		0
