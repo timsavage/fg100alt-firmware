@@ -35,15 +35,16 @@ AVRDUDE_PROGRAMMER = usbtiny
 
 #### Flags
 
+DEFINES = -DF_CPU=$(CLK_FREQ) -DDDS_STEP_CONSTANT=$(DDS_STEP_CONSTANT)
+
 # Compiler
-override CFLAGS = -I. $(INCLUDES) -g -O$(OPTIMIZE) -mmcu=$(MCU) \
-		-DF_CPU=$(CLK_FREQ) -DDDS_STEP_CONSTANT=$(DDS_STEP_CONSTANT) \
+override CFLAGS = -I. $(INCLUDES) -g -O$(OPTIMIZE) -mmcu=$(MCU) $(DEFINES) \
 		-Wall -Werror -Wl,-section-start=.WaveBuffer=0x00800300 \
 		-pedantic -pedantic-errors -std=gnu99 \
 		-fpack-struct -fshort-enums -funsigned-char -funsigned-bitfields -ffunction-sections
 
 # Assembler
-override ASMFLAGS = -I. $(INCLUDES) -mmcu=$(MCU)
+override ASMFLAGS = -I. $(INCLUDES) -mmcu=$(MCU) $(DEFINES)
 
 # Linker
 override LDFLAGS = -Wl,-Map,$(TRG).map $(CFLAGS)

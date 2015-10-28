@@ -4,16 +4,10 @@
 #include <math.h>
 
 #include "defines.h"
-
 #include "lcd.h"
 #include "ui.h"
 #include "dds.h"
 
-State g_state = {500, 2, 0};
-uint8_t g_buttonStatus[BUTTON_COUNT];
-
-int main(void);
-void loop(void);
 
 void init(void) {
 	wdt_disable();
@@ -36,67 +30,66 @@ void init(void) {
 	sei();
 }
 
-/**
- * Check the status of a button and raise events
- */
-void raise_button_events(uint8_t pin, uint8_t button) {
-	PORTB = (PORTB & 0xFF & ~(0x0F << PORTB2)) | _BV(pin);
-	_delay_ms(10);
+void process_button_event(uint8_t button, uint8_t state) {
+	static uint8_t button_status[BUTTON_COUNT];
 
-	if (PINB & _BV(BUTTON_STROBE)) {
-		if (g_buttonStatus[button]) {
-			ui_handle_event(button, BUTTON_REPEAT, &g_state);
+	if (state) {
+		if (button_status[button]) {
+			ui_handle_event(button, BUTTON_REPEAT);
 		} else {
-			ui_handle_event(button, BUTTON_PRESS, &g_state);
+			ui_handle_event(button, BUTTON_PRESS);
 		}
-		g_buttonStatus[button] = BUTTON_DOWN;
+		button_status[button] = BUTTON_DOWN;
 	} else {
-		if (g_buttonStatus[button]) {
-			ui_handle_event(button, BUTTON_RELEASE, &g_state);
+		if (button_status[button]) {
+			ui_handle_event(button, BUTTON_RELEASE);
 		}
-		g_buttonStatus[button] = BUTTON_UP;
+		button_status[button] = BUTTON_UP;
 	}
 	_delay_ms(10);
 }
 
-
-void generate_ui_events() {
-	raise_button_events(MODE_PIN, MODE_BUTTON);
-	raise_button_events(CURSOR_PIN, CURSOR_BUTTON);
-	raise_button_events(PLUS_PIN, PLUS_BUTTON);
-	raise_button_events(MINUS_PIN, MINUS_BUTTON);
+/**
+ * Check status of strobe pins
+ */
+void check_strobe_pin(uint8_t button, uint8_t pin) {
+	PORTB = (PORTB & 0xFF & ~(0x0F << PORTB2)) | _BV(pin);
+	_delay_ms(1);
+	process_button_event(button, PINB & _BV(BUTTON_STROBE));
 }
 
-int main(void) {
-	init();
-
-	_delay_ms(2000);
-
-	ui_redraw_display(&g_state);
-	loop();
-
-	return 1;
+/**
+ * Generate UI events
+ */
+void generate_ui_events() {
+	check_strobe_pin(MODE_BUTTON, MODE_PIN);
+	check_strobe_pin(CURSOR_BUTTON, CURSOR_PIN);
+	check_strobe_pin(PLUS_BUTTON, PLUS_PIN);
+	check_strobe_pin(MINUS_BUTTON, MINUS_PIN);
+	process_button_event(RUN_STOP_BUTTON, !(PINC & _BV(RUN_STOP_PIN)));
+	_delay_ms(50);
 }
 
 void loop(void) {
 	while(1) {
 		generate_ui_events();
 
-		if (!(PINC & _BV(RUN_STOP_PIN))) {
-			dds_select_wave(g_state.function);
-
+		if (DDS_IS_ENABLED) {
 			lcd_disable_cursor();
-
-			DDS_ENABLE;
 			PCICR |= _BV(PCIE1);  // Enable Pin Change interrupt 1
-
-			dds_start(g_state.frequency);
-
+			dds_start(ui_state.frequency);
 			lcd_enable_cursor();
 		}
-
-		_delay_ms(50);
 	}
+}
+
+int main(void) {
+	init();
+	_delay_ms(2000);
+	ui_redraw_display();
+
+	loop();
+	return 1;
 }
 
 ISR(PCINT1_vect)
