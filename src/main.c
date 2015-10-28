@@ -22,9 +22,9 @@ void init(void) {
 	DDRB = DDRB & ~_BV(BUTTON_STROBE);
 
 	// Configure interrupt for Start/Stop button
-	DDRC   &= ~_BV(PINC3);
-	PORTC  |= _BV(PINC3);  // Enable pull up resistor
-	PCMSK1 |= _BV(PCINT11);  // Enable Pin change interrupts on PCI1 for pin 27
+	DDRC  &= ~_BV(PINC3);
+	PORTC |= _BV(PINC3);  // Enable pull up resistor
+	PCICR |= _BV(PCIE1);  // Enable Pin Change interrupt 1
 
 	// Enable interrupts
 	sei();
@@ -76,9 +76,13 @@ void loop(void) {
 
 		if (DDS_IS_ENABLED) {
 			lcd_disable_cursor();
-			PCICR |= _BV(PCIE1);  // Enable Pin Change interrupt 1
+			PCMSK1 = _BV(PCINT11);  // Enable Pin change interrupts on PCI1 for pin 27
+
 			dds_start(ui_state.frequency);
+
+			PCMSK1 = 0;  // Disable Pin change interrupts on PCI1 for pin 27
 			lcd_enable_cursor();
+			_delay_ms(10);
 		}
 	}
 }
@@ -92,12 +96,13 @@ int main(void) {
 	return 1;
 }
 
-ISR(PCINT1_vect)
+ISR(PCINT1_vect, ISR_NAKED)
 {
-	cli();
-	if (!(PINC & _BV(RUN_STOP_PIN))) {
-		PCICR &= ~_BV(PCIE1);  // Disable Pin Change interrupt 1
-		DDS_DISABLE;
-	}
-	sei();
+	asm volatile(
+		"cli" "\n\t"
+		"sbis	0x06, 3" "\n\t"
+		"sbi	0x1E, 0" "\n\t"
+		"sei" "\n\t"
+		"reti" "\n\t"::
+	);
 }
