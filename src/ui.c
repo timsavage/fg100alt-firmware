@@ -5,6 +5,7 @@
  *      Author: tims
  */
 
+#include <avr/pgmspace.h>
 #include "ui.h"
 #include "lcd.h"
 
@@ -15,9 +16,9 @@ const char* functionNames[] = {
 
 void ui_show_splash(void) {
 	lcd_clear();
-	lcd_printf("FG-100 Alt  v%01u.%01u", VERSION_MAJOR, VERSION_MINOR);
+	lcd_printf(PSTR("FG-100 Alt  v%01u.%01u"), VERSION_MAJOR, VERSION_MINOR);
 	lcd_set_cursor(1, 1);
-	lcd_puts("savage.company");
+	lcd_puts(PSTR("savage.company"));
 }
 
 
