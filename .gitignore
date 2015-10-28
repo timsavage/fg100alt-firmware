@@ -9,3 +9,7 @@ build/
 .project
 .cproject
 .settings
+.externalToolBuilders
+
+# UNIX fluff
+*~
