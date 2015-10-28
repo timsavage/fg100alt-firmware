@@ -53,22 +53,14 @@
 #define CURSOR_BUTTON	1
 #define	PLUS_BUTTON		2
 #define MINUS_BUTTON	3
+#define RUN_STOP_BUTTON	4
 
-#define BUTTON_COUNT	4
+#define BUTTON_COUNT	(MINUS_BUTTON + 1)
 
 // Events
 #define NO_OP			0
 #define BUTTON_PRESS	1
 #define BUTTON_REPEAT	2
 #define BUTTON_RELEASE	3
-
-typedef struct {
-	// Configured frequency (this will be stored to EPROM eventually)
-	uint32_t frequency;
-	// Selected frequency offset (used to adjust frequency)
-	uint8_t frequencyOffset;
-	// Current output function
-	uint8_t function;  // Sign wave
-} State;
 
 #endif /* PINOUTS_H_ */

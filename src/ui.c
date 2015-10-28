@@ -5,58 +5,59 @@
  *      Author: tims
  */
 
-#include <avr/pgmspace.h>
 #include "ui.h"
 #include "lcd.h"
+#include "dds.h"
 
 const uint32_t powersOfTen[] = { 1, 10, 100, 1000, 10000, 100000 };
-const char* functionNames[] = {
-	"Sign", "Triangle", "Sawtooth", "R Sawtooth", "Square"
+
+UIState ui_state = {
+	500,	// Frequency
+	2,		// Frequency offset
+	0,		// Wave
 };
 
 void ui_show_splash(void) {
 	lcd_clear();
-	lcd_printf(PSTR("FG-100 Alt  v%01u.%01u"), VERSION_MAJOR, VERSION_MINOR);
+	lcd_printf("FG-100 Alt  v%01u.%01u", VERSION_MAJOR, VERSION_MINOR);
 	lcd_set_cursor(1, 1);
-	lcd_puts(PSTR("savage.company"));
+	lcd_puts("savage.company");
 }
 
-
-void ui_redraw_display(State* state) {
+void ui_redraw_display() {
 	lcd_clear();
-	lcd_printf("Wave: %s", functionNames[state->function]);
+	lcd_printf("Wave: %s", dds_wave_names[ui_state.wave_form]);
 	lcd_set_cursor(0, 1);
-	lcd_printf("Freq: %06uHz", state->frequency);
-	if (state->frequencyOffset >= 0) {
-		lcd_set_cursor(11 - state->frequencyOffset, 1);
+	lcd_printf("Freq: %06uHz", ui_state.frequency);
+	if (ui_state.frequency_offset >= 0) {
+		lcd_set_cursor(11 - ui_state.frequency_offset, 1);
 		lcd_enable_cursor();
 	} else {
 		lcd_disable_cursor();
 	}
 }
 
-
-void ui_handle_event(uint8_t interface, uint8_t event, State* state) {
+void ui_handle_event(uint8_t interface, uint8_t event) {
 	uint8_t changed = 0;
 
 	switch(interface) {
 	case MODE_BUTTON:
 		if (event == BUTTON_PRESS) {
-			state->function = (state->function + 1) % 5;
+			ui_state.wave_form = (ui_state.wave_form + 1) % 5;
 			changed = 1;
 		}
 		break;
 
 	case CURSOR_BUTTON:
 		if (event == BUTTON_PRESS) {
-			state->frequencyOffset = (state->frequencyOffset + 1) % 6;
+			ui_state.frequency_offset = (ui_state.frequency_offset + 1) % 6;
 			changed = 1;
 		}
 		break;
 
 	case PLUS_BUTTON:
 		if ((event == BUTTON_PRESS) | (event == BUTTON_REPEAT)) {
-			state->frequency += powersOfTen[state->frequencyOffset];
+			ui_state.frequency += powersOfTen[ui_state.frequency_offset];
 			changed = 1;
 		}
 		break;
@@ -64,12 +65,18 @@ void ui_handle_event(uint8_t interface, uint8_t event, State* state) {
 	case MINUS_BUTTON:
 		if ((event == BUTTON_PRESS) | (event == BUTTON_REPEAT)) {
 
-			state->frequency -= powersOfTen[state->frequencyOffset];
+			ui_state.frequency -= powersOfTen[ui_state.frequency_offset];
 
 			changed = 1;
 		}
 		break;
+
+	case RUN_STOP_BUTTON:
+		if (event == BUTTON_PRESS) {
+			dds_select_wave(ui_state.wave_form);
+			DDS_ENABLE;
+		}
 	}
 
-	if (changed) ui_redraw_display(state);
+	if (changed) ui_redraw_display();
 }
