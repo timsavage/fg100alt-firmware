@@ -5,18 +5,18 @@ The FG 100 is a cheap function generator widely available on Ebay.
 
 See https://hackaday.io/project/7985-alternate-firmware-for-fg-100-dds-function-gen for details
 
-## Requrirements
+## Requirements
 
-You will require:
+You will need:
 
 * Obviously a FG-100 (ebay is a good source)
-* ATMega328p 28pin DIP 
+* ATMega328p 28pin DIP microcontroller 
 * AVR programmer/ISP (the Makefile defaults to using a USBTiny ISP)
 * avr-gcc, avrdude and gnumake installed
  
-If you are using an alternate programmer you will need to update the Makefile with the currect programmer name
-for AVRdude update the *AVRDUDE_PROGRAMMER* parameter with the correct value for your programmer (see AVR dude
-documentation for info)
+If you are using a different programmer you will need to update the Makefile with the currect programmer code
+for AVRdude, update the *AVRDUDE_PROGRAMMER* parameter with the correct value for your programmer (see AVR dude
+documentation for info).
 
 ## Compile/Install
 
@@ -42,4 +42,4 @@ Finally open up the FG-100, unscrew the LCD and pull out, remove the ATMega48 fr
 
 Ready to rock.
 
-- Enjoy!
+~ Enjoy!
