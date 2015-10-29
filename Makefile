@@ -80,11 +80,11 @@ LST = $(filter %.lst, $(OBJS:.o=.lst))
 
 
 # Build all
-all: $(TRG)
+all: hex
 	
 stats: $(TRG)
-	$(OBJDUMP) -h $(TRG)
-	$(SIZE) $(TRG)
+	@$(SIZE) -C --mcu=$(MCU) $(TRG)
+	@$(OBJDUMP) -h $(TRG)
 
 hex: $(HEXTRG)
 
