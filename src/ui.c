@@ -14,7 +14,12 @@ const uint32_t powersOfTen[] = { 1, 10, 100, 1000, 10000, 100000 };
 UIState ui_state = {
 	500,	// Frequency
 	2,		// Frequency offset
-	0,		// Wave
+	0,		// Wave form
+	500,	// Start sweep frequency
+	1500,	// End sweep frequency
+	10,		// Sweep frequency step
+	500,	// Step period
+	0		// Current view
 };
 
 void ui_show_splash(void) {
@@ -24,16 +29,39 @@ void ui_show_splash(void) {
 	lcd_puts("savage.company");
 }
 
-void ui_redraw_display() {
-	lcd_clear();
-	lcd_printf("Wave: %s", dds_wave_names[ui_state.wave_form]);
+void ui_redraw_view_0(void) {
+	lcd_printf("> Wv: %s", dds_wave_names[ui_state.wave_form]);
 	lcd_set_cursor(0, 1);
-	lcd_printf("Freq: %05uHz", ui_state.frequency);
+	lcd_printf("> Fq: %05uHz", ui_state.frequency);
 	if (ui_state.frequency_offset >= 0) {
 		lcd_set_cursor(10 - ui_state.frequency_offset, 1);
 		lcd_enable_cursor();
 	} else {
 		lcd_disable_cursor();
+	}
+}
+
+void ui_redraw_view_1(void) {
+	lcd_printf("> S Fq: %s", dds_wave_names[ui_state.wave_form]);
+	lcd_set_cursor(0, 1);
+	lcd_printf("> Fq: %05uHz", ui_state.frequency);
+	if (ui_state.frequency_offset >= 0) {
+		lcd_set_cursor(10 - ui_state.frequency_offset, 1);
+		lcd_enable_cursor();
+	} else {
+		lcd_disable_cursor();
+	}
+}
+
+void ui_redraw_display() {
+	lcd_clear();
+	switch(ui_state.current_view) {
+	case 0:
+		ui_redraw_view_0();
+		break;
+	case 1:
+		ui_redraw_view_1();
+		break;
 	}
 }
 
