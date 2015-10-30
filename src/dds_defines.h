@@ -69,6 +69,16 @@
 #define DDS_MAX_FREQ 500000
 #endif
 
+// Port to trigger break on
+#ifndef DDS_BREAK_ADDR
+#define DDS_BREAK_ADDR PORTC
+#endif
+
+// Bit to trigger break on
+#ifndef DDS_BREAK_BIT
+#define DDS_BREAK_BIT PIN3
+#endif
+
 // Check if frequency is in DDS range
 #define DDS_FREQ_IN_RANGE(freq)	((freq <= DDS_MAX_FREQ) & (freq >= DDS_MIN_FREQ))
 
