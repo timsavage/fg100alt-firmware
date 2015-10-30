@@ -39,6 +39,12 @@
 #define DDS_STEP_CONSTANT 5.0331648
 #endif
 
+#ifndef DDS_STEP_SWEEP_CONSTANT
+/* prevent compiler error by supplying a default based on a 30Mhz clock */
+# warning "DDS_STEP_SWEEP_CONSTANT not defined for \"dds_defines.h\""
+#define DDS_STEP_SWEEP_CONSTANT 9.2274688
+#endif
+
 // Define DDS port (defaults to PORTD)
 #ifndef DDS_PORT
 #define DDS_PORT PORTD
@@ -49,16 +55,6 @@
 #define DDS_DDR DDRD
 #endif
 
-// Register used to break the DDS cycle
-#ifndef DDS_BREAK_REGISTER
-#define DDS_BREAK_REGISTER GPIOR0
-#endif
-
-// Bit within the Break register
-#ifndef DDS_BREAK_BIT
-#define DDS_BREAK_BIT GPIOR00
-#endif
-
 // Minimum frequency
 #ifndef DDS_MIN_FREQ
 #define DDS_MIN_FREQ 1
@@ -67,6 +63,26 @@
 // Maximum frequency (supported by hardware), default is 500kHz
 #ifndef DDS_MAX_FREQ
 #define DDS_MAX_FREQ 500000
+#endif
+
+// Register used to break the DDS cycle
+#ifndef DDS_ENABLE_ADDR
+#define DDS_ENABLE_ADDR GPIOR0
+#endif
+
+// Bit within the Break register
+#ifndef DDS_ENABLE_BIT
+#define DDS_ENABLE_BIT GPIOR00
+#endif
+
+// DDS break address
+#ifndef DDS_BREAK_ADDR
+#define DDS_BREAK_ADDR PINC
+#endif
+
+// DDS break bit
+#ifndef DDS_BREAK_BIT
+#define DDS_BREAK_BIT PINC3
 #endif
 
 // Check if frequency is in DDS range
