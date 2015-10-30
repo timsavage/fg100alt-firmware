@@ -12,6 +12,7 @@
 uint8_t wave_buffer[256] __attribute__ ((section (".WaveBuffer")));
 
 extern void ddsloop(uint32_t step, uint8_t* waveform);
+extern void ddsloop_sweep(uint32_t step, uint8_t* waveform);
 
 // DDS wave names
 const char* dds_wave_names[] = {
@@ -125,8 +126,12 @@ const uint8_t wave_table[][256] PROGMEM = {
 void dds_init(void) {
 	// Set DAC port to output
 	DDS_DDR = 0xFF;  // Enable all output pins on PORTD
-	DDS_PORT = 0x7F;  // Set output to the middle (is offset to 0)
+	DDS_PORT = 0x7F;  // Set output to the neutral (is offset to 0)
 	DDS_DISABLE;
+
+	// Setup sweep timer
+	TCCR1B |= (_BV(WGM12) | _BV(CS10) | _BV(CS11));  // CTC mode + 64 clock divider
+	OCR1A = 31250;  // 10Hz at 20Mhz clock
 }
 
 void dds_select_wave(uint8_t wave_idx) {
@@ -138,5 +143,15 @@ void dds_start(uint32_t frequency) {
 	DDS_ENABLE;
 	ddsloop(step, wave_buffer);
 	DDS_DISABLE;
-	DDS_PORT = 0x7F;
+	DDS_PORT = 0x7F;  // Reset to neutral
+}
+
+void dds_start_sweep(uint32_t frequency) {
+	uint32_t step = (frequency * DDS_STEP_SWEEP_CONSTANT) + 0.5;
+	DDS_ENABLE;
+	TIMSK1 |= _BV(OCIE1A); // Enable timer interrupt
+	ddsloop_sweep(step, wave_buffer);
+	TIMSK1 &= ~_BV(OCIE1A); // Disable timer interrupt
+	DDS_DISABLE;
+	DDS_PORT = 0x7F;  // Reset to neutral
 }
