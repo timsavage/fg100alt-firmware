@@ -98,4 +98,9 @@
 // Number of waveforms defined in the DDS waveform table.
 #define DDS_WAVE_COUNT (DDS_SQUARE_WAVE + 1)
 
+// Generate a wave at a fixed frequency
+#define DDS_MODE_FIXED 0
+// Generate a wave while sweeping through frequencies
+#define DDS_MODE_SWEEP 1
+
 #endif /* DDS_DEFINES_H_ */
