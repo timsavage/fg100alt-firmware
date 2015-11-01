@@ -5,21 +5,23 @@
  *      Author: tims
  */
 
+#include <string.h>
 #include "ui.h"
 #include "lcd.h"
 #include "dds.h"
 
+
 const uint32_t powersOfTen[] = { 1, 10, 100, 1000, 10000, 100000 };
 
 UIState ui_state = {
-	500,	// Frequency
-	2,		// Frequency offset
-	0,		// Wave form
-	500,	// Start sweep frequency
-	1500,	// End sweep frequency
-	10,		// Sweep frequency step
-	500,	// Step period
-	0		// Current view
+	DDS_SIGN_WAVE,	// Function
+	500,			// Frequency
+	DDS_MODE_FIXED, // Wave mode
+	1500,			// End sweep frequency
+	5000,			// Sweep period (ms)
+	0,				// Current page
+	0,				// Current field
+	2				// Offset of the cursor when editing a value.
 };
 
 void ui_show_splash(void) {
@@ -29,38 +31,49 @@ void ui_show_splash(void) {
 	lcd_puts("savage.company");
 }
 
-void ui_redraw_view_0(void) {
-	lcd_printf("> Wv: %s", dds_wave_names[ui_state.wave_form]);
+void ui_show_fixed(void) {
+	lcd_disable_cursor();
+	lcd_clear();
+	lcd_set_cursor(5 - (strlen(dds_wave_names[ui_state.function])/ 2), 0);
+	lcd_printf("Wave: %s", dds_wave_names[ui_state.function]);
+	lcd_set_cursor(4, 1);
+	lcd_printf("%06luHz", ui_state.frequency);
+}
+
+void ui_show_sweep(void) {
+	lcd_disable_cursor();
+	lcd_clear();
+	lcd_printf("Sweep: %s", dds_wave_names[ui_state.function]);
 	lcd_set_cursor(0, 1);
-	lcd_printf("> Fq: %05uHz", ui_state.frequency);
-	if (ui_state.frequency_offset >= 0) {
-		lcd_set_cursor(10 - ui_state.frequency_offset, 1);
-		lcd_enable_cursor();
-	} else {
-		lcd_disable_cursor();
+	lcd_printf("%06lu-%06luHz", ui_state.frequency, ui_state.end_frequency);
+}
+
+
+void inline _draw_frequency_input(uint32_t value, uint8_t col, uint8_t row, uint8_t focus) {
+	lcd_set_cursor(col, row);
+	lcd_printf("%06luHz", value);
+	if (focus) {
+		lcd_set_cursor(col + (5 - ui_state.cursor_offset), row);
 	}
 }
 
-void ui_redraw_view_1(void) {
-	lcd_printf("> S Fq: %s", dds_wave_names[ui_state.wave_form]);
+void _page0_redraw(void) {
+	if (ui_state.current_field == 0) lcd_write(0x7E);
+	lcd_printf("f(x): %s", dds_wave_names[ui_state.function]);
 	lcd_set_cursor(0, 1);
-	lcd_printf("> Fq: %05uHz", ui_state.frequency);
-	if (ui_state.frequency_offset >= 0) {
-		lcd_set_cursor(10 - ui_state.frequency_offset, 1);
-		lcd_enable_cursor();
-	} else {
-		lcd_disable_cursor();
-	}
+	lcd_puts(" Freq:"); _draw_frequency_input(ui_state.frequency, 6, 1, 1);
+	lcd_enable_cursor();
+}
+
+void page0_handle_event(uint8_t target, uint8_t event) {
+
 }
 
 void ui_redraw_display() {
 	lcd_clear();
-	switch(ui_state.current_view) {
+	switch(ui_state.current_page) {
 	case 0:
-		ui_redraw_view_0();
-		break;
-	case 1:
-		ui_redraw_view_1();
+		_page0_redraw();
 		break;
 	}
 }
@@ -71,21 +84,21 @@ void ui_handle_event(uint8_t interface, uint8_t event) {
 	switch(interface) {
 	case MODE_BUTTON:
 		if (event == BUTTON_PRESS) {
-			ui_state.wave_form = (ui_state.wave_form + 1) % 5;
+			ui_state.function = (ui_state.function + 1) % 5;
 			changed = 1;
 		}
 		break;
 
 	case CURSOR_BUTTON:
 		if (event == BUTTON_PRESS) {
-			ui_state.frequency_offset = (ui_state.frequency_offset + 1) % 5;
+			ui_state.cursor_offset = (ui_state.cursor_offset + 1) % 6;
 			changed = 1;
 		}
 		break;
 
 	case PLUS_BUTTON:
 		if ((event == BUTTON_PRESS) | (event == BUTTON_REPEAT)) {
-			uint32_t frequency = ui_state.frequency + powersOfTen[ui_state.frequency_offset];
+			uint32_t frequency = ui_state.frequency + powersOfTen[ui_state.cursor_offset];
 			if (DDS_FREQ_IN_RANGE(frequency)) {
 				ui_state.frequency = frequency;
 				changed = 1;
@@ -95,7 +108,7 @@ void ui_handle_event(uint8_t interface, uint8_t event) {
 
 	case MINUS_BUTTON:
 		if ((event == BUTTON_PRESS) | (event == BUTTON_REPEAT)) {
-			uint32_t frequency = ui_state.frequency - powersOfTen[ui_state.frequency_offset];
+			uint32_t frequency = ui_state.frequency - powersOfTen[ui_state.cursor_offset];
 			if (DDS_FREQ_IN_RANGE(frequency)) {
 				ui_state.frequency = frequency;
 				changed = 1;
@@ -105,7 +118,7 @@ void ui_handle_event(uint8_t interface, uint8_t event) {
 
 	case RUN_STOP_BUTTON:
 		if (event == BUTTON_PRESS) {
-			dds_select_wave(ui_state.wave_form);
+			dds_select_wave(ui_state.function);
 			DDS_ENABLE;
 		}
 	}

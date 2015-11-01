@@ -52,8 +52,10 @@ void process_button_event(uint8_t button, uint8_t state) {
  * Check status of strobe pins
  */
 void check_strobe_pin(uint8_t button, uint8_t pin) {
+	// Turn on one of the 4 pins
 	PORTB = (PORTB & 0xFF & ~(0x0F << PORTB2)) | _BV(pin);
 	_delay_ms(1);
+	// Process events
 	process_button_event(button, PINB & _BV(BUTTON_STROBE));
 }
 
@@ -74,10 +76,11 @@ void loop(void) {
 		generate_ui_events();
 
 		if (DDS_IS_ENABLED) {
-			lcd_disable_cursor();
+			ui_show_fixed();
 			dds_start(ui_state.frequency);
-			lcd_enable_cursor();
+//			dds_start_sweep(ui_state.frequency);
 			DDS_DISABLE;
+			ui_redraw_display();
 		}
 	}
 }
