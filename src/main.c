@@ -9,13 +9,16 @@
 #include "dds.h"
 
 
-void init(void) {
+void init_mcu(void) {
 	wdt_disable();
 
 	// Initialize the LCD and display splash message
 	lcd_init();
+
 	ui_show_splash();
 
+	// UI/DDS initialize
+	ui_init();
 	dds_init();
 
 	// Configure strobe pin
@@ -28,6 +31,7 @@ void init(void) {
 	// Enable interrupts
 	sei();
 }
+
 
 void process_button_event(uint8_t button, uint8_t state) {
 	static uint8_t button_status[BUTTON_COUNT];
@@ -48,6 +52,7 @@ void process_button_event(uint8_t button, uint8_t state) {
 	_delay_ms(10);
 }
 
+
 /**
  * Check status of strobe pins
  */
@@ -58,6 +63,7 @@ void check_strobe_pin(uint8_t button, uint8_t pin) {
 	// Process events
 	process_button_event(button, PINB & _BV(BUTTON_STROBE));
 }
+
 
 /**
  * Generate UI events
@@ -71,6 +77,7 @@ void generate_ui_events() {
 	_delay_ms(50);
 }
 
+
 void loop(void) {
 	while(1) {
 		generate_ui_events();
@@ -80,15 +87,17 @@ void loop(void) {
 			dds_start(ui_state.frequency);
 //			dds_start_sweep(ui_state.frequency);
 			DDS_DISABLE;
-			ui_redraw_display();
+			ui_draw_display();
 		}
 	}
 }
 
+
 int main(void) {
-	init();
+	init_mcu();
+
 	_delay_ms(2000);
-	ui_redraw_display();
+	ui_draw_display();
 
 	loop();
 	return 1;

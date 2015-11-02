@@ -139,7 +139,7 @@ void lcd_disable_autoscroll(void) {
   lcd_command(LCD_ENTRYMODESET | lcd_displayparams);
 }
 
-void lcd_create_char(uint8_t location, uint8_t *charmap) {
+void lcd_create_char(uint8_t location, const uint8_t *charmap) {
 	int i;
 	lcd_command(LCD_SETCGRAMADDR | ((location & 0x7) << 3));
 	for (i = 0; i < 8; i++) {

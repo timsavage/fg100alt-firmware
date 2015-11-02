@@ -32,21 +32,33 @@ typedef struct {
 extern UIState ui_state;
 
 /**
+ * Initialize UI
+ */
+void ui_init(void);
+
+/**
  * Show splash display
  */
 void ui_show_splash(void);
-void ui_show_fixed(void);
-void ui_show_sweep(void);
 
+/**
+ * Show fixed display
+ */
+void ui_show_fixed(void);
+
+/**
+ * Show sweep display
+ */
+void ui_show_sweep(void);
 
 /**
  * Redraw the current display to the LCD
  */
-void ui_redraw_display();
+void ui_draw_display();
 
 /**
- * Handle a interface event (eg button press)
+ * Handle a interface event (for example button press)
  */
-void ui_handle_event(uint8_t interface, uint8_t event);
+void ui_handle_event(uint8_t ctrl, uint8_t event);
 
 #endif /* SRC_UI_H_ */
