@@ -18,7 +18,7 @@ If you are using a different programmer you will need to update the Makefile wit
 for AVRdude, update the *AVRDUDE_PROGRAMMER* parameter with the correct value for your programmer (see AVR dude
 documentation for info).
 
-> Note: master is bleeding edge development (and may be broken), visit the [releases](https://github.com/timsavage/fg100alt-firmware/releases) page to get one the stable point releases.
+> Note: for bleeding edge development (and may be broken), get the ng-dev branch.
 
 ## Compile/Install
 
