@@ -35,21 +35,23 @@ void init_mcu(void) {
 
 void process_button_event(uint8_t button, uint8_t state) {
 	static uint8_t button_status[BUTTON_COUNT];
+	uint8_t* btn = &button_status[button];
 
-	if (state) {
-		if (button_status[button]) {
-			ui_handle_event(button, BUTTON_REPEAT);
-		} else {
-			ui_handle_event(button, BUTTON_PRESS);
-		}
-		button_status[button] = BUTTON_DOWN;
-	} else {
-		if (button_status[button]) {
-			ui_handle_event(button, BUTTON_RELEASE);
-		}
-		button_status[button] = BUTTON_UP;
+	// Append state to history
+	*btn = *btn << 1;
+	*btn |= (state != 0);
+
+	if ((*btn & 0xC7) == 0x07) {
+		*btn = 0xFF;
+		ui_handle_event(button, BUTTON_PRESS);
+	} else if ((*btn & 0xC7) == 0xC0) {
+		*btn = 0;
+		ui_handle_event(button, BUTTON_RELEASE);
 	}
-	_delay_ms(10);
+
+//	if (*btn == 0xFF) {
+//		ui_handle_event(button, BUTTON_REPEAT);
+//	}
 }
 
 
@@ -84,6 +86,7 @@ void loop(void) {
 
 		if (DDS_IS_ENABLED) {
 			ui_show_fixed();
+			_delay_ms(250);  // Hack to ensure button is released
 			dds_start(ui_state.frequency);
 //			dds_start_sweep(ui_state.frequency);
 			DDS_DISABLE;
