@@ -12,11 +12,13 @@ You will need:
 * Obviously a FG-100 (ebay is a good source)
 * ATMega328p 28pin DIP microcontroller 
 * AVR programmer/ISP (the Makefile defaults to using a USBTiny ISP)
-* avr-gcc, avrdude and gnumake installed
+* AVR toolchain (eg avr-gcc, avrdude and gnumake) installed
  
 If you are using a different programmer you will need to update the Makefile with the currect programmer code
 for AVRdude, update the *AVRDUDE_PROGRAMMER* parameter with the correct value for your programmer (see AVR dude
 documentation for info).
+
+> Note: master is bleeding edge development (and may be broken), visit the [releases](https://github.com/timsavage/fg100alt-firmware/releases) page to get one the stable point releases.
 
 ## Compile/Install
 
