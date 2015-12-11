@@ -18,7 +18,7 @@ If you are using a different programmer you will need to update the Makefile wit
 for AVRdude, update the *AVRDUDE_PROGRAMMER* parameter with the correct value for your programmer (see AVR dude
 documentation for info).
 
-> Note: for bleeding edge development (and may be broken), get the ng-dev branch.
+> Note: for bleeding edge development (that may be broken), get the ng-dev branch.
 
 ## Compile/Install
 
