@@ -24,10 +24,6 @@
 #define MINUS_PIN 		PINB3
 #define BUTTON_STROBE 	PINB1
 
-// Current state of the button
-#define BUTTON_UP 		0
-#define BUTTON_DOWN 	1
-
 
 /**
  * LCD

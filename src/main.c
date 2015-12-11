@@ -29,23 +29,26 @@ void init(void) {
 	sei();
 }
 
+
 void process_button_event(uint8_t button, uint8_t state) {
 	static uint8_t button_status[BUTTON_COUNT];
+	uint8_t* btn = &button_status[button];
 
-	if (state) {
-		if (button_status[button]) {
-			ui_handle_event(button, BUTTON_REPEAT);
-		} else {
-			ui_handle_event(button, BUTTON_PRESS);
-		}
-		button_status[button] = BUTTON_DOWN;
-	} else {
-		if (button_status[button]) {
-			ui_handle_event(button, BUTTON_RELEASE);
-		}
-		button_status[button] = BUTTON_UP;
+	// Append state to history
+	*btn = *btn << 1;
+	*btn |= (state != 0);
+
+	if ((*btn & 0xC7) == 0x07) {
+		*btn = 0xFF;
+		ui_handle_event(button, BUTTON_PRESS);
+	} else if ((*btn & 0xC7) == 0xC0) {
+		*btn = 0;
+		ui_handle_event(button, BUTTON_RELEASE);
 	}
-	_delay_ms(10);
+
+//	if (*btn == 0xFF) {
+//		ui_handle_event(button, BUTTON_REPEAT);
+//	}
 }
 
 /**
@@ -66,7 +69,7 @@ void generate_ui_events() {
 	check_strobe_pin(CURSOR_BUTTON, CURSOR_PIN);
 	check_strobe_pin(PLUS_BUTTON, PLUS_PIN);
 	check_strobe_pin(MINUS_BUTTON, MINUS_PIN);
-	_delay_ms(50);
+	_delay_ms(10);
 }
 
 void loop(void) {
@@ -75,6 +78,7 @@ void loop(void) {
 
 		if (DDS_IS_ENABLED) {
 			lcd_disable_cursor();
+			_delay_ms(50);  // Hack to ensure button is released
 			dds_start(ui_state.frequency);
 			lcd_enable_cursor();
 			DDS_DISABLE;
