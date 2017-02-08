@@ -15,7 +15,7 @@ extern void ddsloop(uint32_t step, uint8_t* waveform);
 
 // DDS wave names
 const char* dds_wave_names[] = {
-	"Sign",
+	"Sine",
 	"Triangle",
 	"Sawtooth",
 	"R Sawtooth",
@@ -24,7 +24,7 @@ const char* dds_wave_names[] = {
 
 // DDS wave tables
 const uint8_t wave_table[][256] PROGMEM = {
-	// Sign Wave
+	// Sine Wave
 	{
 		127, 130, 133, 136, 139, 143, 146, 149, 152, 155, 158, 161, 164, 167, 170, 173,
 		176, 178, 181, 184, 187, 190, 192, 195, 198, 200, 203, 205, 208, 210, 212, 215,
