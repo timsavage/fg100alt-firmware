@@ -1,23 +1,25 @@
-/*
+/*-----------------------------------------------------------------------------
  * defines.h
  *
- *  Created on: 21 Oct 2015
- *      Author: tims
+ * Created: 21 Oct 2015
+ * Author: tims
+ * Revised: 17 Apr, 2017
+ * By: crHARPER
+ *
+ *-----------------------------------------------------------------------------
  */
-
 #ifndef DEFINES_H_
 #define DEFINES_H_
 
 #include <avr/io.h>
 
-#define VERSION_MAJOR 	0
-#define VERSION_MINOR	2
+#define VERSION_MAJOR 	1
+#define VERSION_MINOR	0
 
 
-/**
- * Input switches
- */
+// Input switches
 #define RUN_STOP_PIN 	PINC3
+
 #define MODE_PIN 		PINB5
 #define CURSOR_PIN 		PINB4
 #define PLUS_PIN 		PINB2
@@ -25,9 +27,7 @@
 #define BUTTON_STROBE 	PINB1
 
 
-/**
- * LCD
- */
+// LCD
 #define LCD_CTRL_PORT 	PORTC
 #define LCD_CTRL_DDR 	DDRC
 #define LCD_DATA_PORT 	PORTB
@@ -38,25 +38,13 @@
 #define LCD_LOW_BYTE 	PORTB2
 
 
-/**
- * UI
- *
- * Main loop provides a simple HAL to simplify UI.
- */
+// Button equivalent bits
+#define NO_BUTTON       0x00
+#define MODE_BUTTON		0x01
+#define CURSOR_BUTTON	0x02
+#define	PLUS_BUTTON		0x04
+#define MINUS_BUTTON	0x08
+#define RUN_STOP_BUTTON	0x10
 
-// Buttons
-#define MODE_BUTTON		0
-#define CURSOR_BUTTON	1
-#define	PLUS_BUTTON		2
-#define MINUS_BUTTON	3
-#define RUN_STOP_BUTTON	4
-
-#define BUTTON_COUNT	(MINUS_BUTTON + 1)
-
-// Events
-#define NO_OP			0
-#define BUTTON_PRESS	1
-#define BUTTON_REPEAT	2
-#define BUTTON_RELEASE	3
 
 #endif /* DEFINES_H_ */

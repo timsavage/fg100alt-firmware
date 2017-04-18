@@ -15,7 +15,7 @@ DDS_STEP_CONSTANT = 5.0331648
 #DDS_STEP_CONSTANT = 7.5497472
 
 # Source files
-SRC = main.c lcd.c ui.c dds.c dds.S
+SRC = config.c crc8.c lcd.c ui.c dds.c  dds.S main.c
 
 # Additional include paths
 INCLUDES =
@@ -42,6 +42,7 @@ override CFLAGS = -I. $(INCLUDES) -g -O$(OPTIMIZE) -mmcu=$(MCU) $(DEFINES) \
 		-Wall -Werror -Wl,-section-start=.WaveBuffer=0x00800300 \
 		-pedantic -pedantic-errors -std=gnu99 \
 		-fpack-struct -fshort-enums -funsigned-char -funsigned-bitfields -ffunction-sections
+		
 
 # Assembler
 override ASMFLAGS = -I. $(INCLUDES) -mmcu=$(MCU) $(DEFINES)
@@ -93,8 +94,13 @@ upload: hex
 
 fuses: 
 	$(AVRDUDE) -c $(AVRDUDE_PROGRAMMER) -p $(MCU) -U lfuse:w:0xf7:m -U hfuse:w:0xd9:m
+    
+# to use internal osc. for programing
+# otherwise an external xtal is required
+default: 
+	$(AVRDUDE) -c $(AVRDUDE_PROGRAMMER) -p $(MCU) -U lfuse:w:0x62:m -U hfuse:w:0xd9:m
 
-install: fuses upload
+program: default upload fuses
 
 # Linking
 $(TRG): $(OBJS) 

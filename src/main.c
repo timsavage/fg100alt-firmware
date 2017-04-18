@@ -1,96 +1,122 @@
+/*-----------------------------------------------------------------------------
+ * main.c
+ *
+ * Created: 25 Oct 2015
+ * Author: tims
+ * Revised: 17 Apr, 2017
+ * By: crHARPER
+ *
+ *-----------------------------------------------------------------------------
+ */
 #include <util/delay.h>
 #include <avr/interrupt.h>
 #include <avr/wdt.h>
 #include <math.h>
 
+
 #include "defines.h"
+#include "config.h"
 #include "lcd.h"
 #include "ui.h"
 #include "dds.h"
 
+extern Config_Eeprom_Type ui_state;
 
+
+//-----------------------------------------------------------------------------
 void init(void) {
-	wdt_disable();
+	
+    
+    // Do first to set correct DC offset of output
+    // fixes bug in original code
+    dds_init();
+    
+    wdt_disable();
+ 
+	// Configure Strobe as Input
+	DDRB  &= ~_BV(BUTTON_STROBE);
+    PORTB |=  _BV(BUTTON_STROBE);   // Enable pull up resistor
+	// Configure Run/Stop as Input
+	DDRC  &= ~_BV(PINC3);
+	PORTC |=  _BV(PINC3);           // Enable pull up resistor
 
-	// Initialize the LCD and display splash message
+    // Initialize the LCD and display splash message
 	lcd_init();
 	ui_show_splash();
-
-	dds_init();
-
-	// Configure strobe pin
-	DDRB = DDRB & ~_BV(BUTTON_STROBE);
-
-	// Configure interrupt for Start/Stop button
-	DDRC  &= ~_BV(PINC3);
-	PORTC |= _BV(PINC3);  // Enable pull up resistor
-
+    
 	// Enable interrupts
 	sei();
 }
 
 
-void process_button_event(uint8_t button, uint8_t state) {
-	static uint8_t button_status[BUTTON_COUNT];
-	uint8_t* btn = &button_status[button];
+//-----------------------------------------------------------------------------
+uint8_t check_strobe_pin( uint8_t pin) {
+    uint8_t temp;
 
-	// Append state to history
-	*btn = *btn << 1;
-	*btn |= (state != 0);
+    // set PortB nibble for corrisponding button bit
+	PORTB = (PORTB & ~(0x0F << PORTB2)) | _BV(pin);
+	_delay_ms(5);  // settling time 
+	temp = (PINB & _BV(BUTTON_STROBE)); //read
+    PORTB = (PORTB & ~(0x0F << PORTB2));
+    return temp;
 
-	if ((*btn & 0xC7) == 0x07) {
-		*btn = 0xFF;
-		ui_handle_event(button, BUTTON_PRESS);
-	} else if ((*btn & 0xC7) == 0xC0) {
-		*btn = 0;
-		ui_handle_event(button, BUTTON_RELEASE);
-	}
-
-//	if (*btn == 0xFF) {
-//		ui_handle_event(button, BUTTON_REPEAT);
-//	}
 }
 
-/**
- * Check status of strobe pins
- */
-void check_strobe_pin(uint8_t button, uint8_t pin) {
-	PORTB = (PORTB & 0xFF & ~(0x0F << PORTB2)) | _BV(pin);
-	_delay_ms(1);
-	process_button_event(button, PINB & _BV(BUTTON_STROBE));
+
+//-----------------------------------------------------------------------------
+// Generate UI events
+void operator_input() {
+    uint8_t buttons = 0;
+    
+    if( RUN )
+        buttons |= RUN_STOP_BUTTON;
+
+    // strobed button inputs must be checked one at a time
+	
+    if( check_strobe_pin(MODE_PIN) )
+        buttons |= MODE_BUTTON;
+    
+    if( check_strobe_pin(CURSOR_PIN) )
+        buttons |= CURSOR_BUTTON;
+    
+	if( check_strobe_pin(PLUS_PIN) )
+        buttons |= PLUS_BUTTON;
+    
+	if( check_strobe_pin(MINUS_PIN) )
+        buttons |= MINUS_BUTTON;
+    
+    ui_handle_event( buttons );
+
 }
 
-/**
- * Generate UI events
- */
-void generate_ui_events() {
-	process_button_event(RUN_STOP_BUTTON, !(PINC & _BV(RUN_STOP_PIN)));
-	check_strobe_pin(MODE_BUTTON, MODE_PIN);
-	check_strobe_pin(CURSOR_BUTTON, CURSOR_PIN);
-	check_strobe_pin(PLUS_BUTTON, PLUS_PIN);
-	check_strobe_pin(MINUS_BUTTON, MINUS_PIN);
-	_delay_ms(10);
-}
 
-void loop(void) {
-	while(1) {
-		generate_ui_events();
 
-		if (DDS_IS_ENABLED) {
-			lcd_disable_cursor();
-			_delay_ms(50);  // Hack to ensure button is released
-			dds_start(ui_state.frequency);
-			lcd_enable_cursor();
-			DDS_DISABLE;
-		}
-	}
-}
-
+//-----------------------------------------------------------------------------
 int main(void) {
-	init();
+
+    init();
+    
+    config_init();  //get saves setting from EEPROM
+    
 	_delay_ms(2000);
 	ui_redraw_display();
 
-	loop();
-	return 1;
+    while(1) {
+
+        operator_input();
+
+		if (DDS_IS_ENABLED) {
+			lcd_disable_cursor();
+        
+			dds_start(ui_state.frequency);
+        
+			lcd_enable_cursor();
+			DDS_DISABLE;
+		}
+        
+        // implement sleep mode here to save power
+        _delay_ms(100);
+
+	}
+
 }
