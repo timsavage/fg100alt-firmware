@@ -1,3 +1,12 @@
+;-----------------------------------------------------------------------------
+; dds.S
+;
+; Created: 25 Oct 2015
+; Author: tims
+; Revised: 17 Apr, 2017
+; By: crHARPER
+;
+;-----------------------------------------------------------------------------
 #include <avr/io.h>
 #include "dds_defines.h"
 
@@ -26,12 +35,18 @@ ddsloop:
 
 ; only works if WAVEFORM_L == 0
 loop:
-	add		FIX_L, STEP_0			; 1 clock
-	adc		FIX_H, STEP_1			; 1 clock
-	adc		r30, STEP_2				; 1 clock
-	ld		I, Z					; 2 clocks
+	add		FIX_L, STEP_0			    ; 1 clock
+	adc		FIX_H, STEP_1			    ; 1 clock
+	adc		r30, STEP_2				    ; 1 clock
+	ld		I, Z					    ; 2 clocks
 	out		_SFR_IO_ADDR(DDS_PORT), I	; 1 clock
 	sbic	_SFR_IO_ADDR(PINC), PINC3	; 1 clock (if unset)
-	rjmp	loop					; 2 clocks
-	ret								; --------
-									; 9 clocks
+	rjmp	loop					    ; 2 clocks
+    
+; wait for R/S button release
+wait:
+    sbis	_SFR_IO_ADDR(PINC), PINC3
+	rjmp	wait					 
+
+    ret								    ; --------
+                                        ; 9 clocks

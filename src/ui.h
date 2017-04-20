@@ -1,39 +1,24 @@
-/*
+/*-----------------------------------------------------------------------------
  * ui.h
  *
- *  Created on: 25 Oct 2015
- *      Author: tims
+ * Created: 25 Oct 2015
+ * Author: tims
+ * Revised: 17 Apr, 2017
+ * By: crHARPER
+ *
+ *-----------------------------------------------------------------------------
  */
-
 #ifndef SRC_UI_H_
 #define SRC_UI_H_
 
 #include "defines.h"
 
-typedef struct {
-	// Configured frequency (this will be stored to EPROM eventually)
-	uint32_t frequency;
-	// Selected frequency offset (used to adjust frequency)
-	uint8_t frequency_offset;
-	// Current output function
-	uint8_t wave_form;  // Sign wave
-} UIState;
-
-extern UIState ui_state;
-
-/**
- * Show splash display
- */
 void ui_show_splash(void);
+void ui_redraw_display(void);
+void ui_handle_event(uint8_t);
 
-/**
- * Redraw the current display to the LCD
- */
-void ui_redraw_display();
+#define RUN (!(PINC & _BV(RUN_STOP_PIN)))
 
-/**
- * Handle a interface event (eg button press)
- */
-void ui_handle_event(uint8_t interface, uint8_t event);
+#define HOLD_TIME 25
 
 #endif /* SRC_UI_H_ */

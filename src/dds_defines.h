@@ -1,10 +1,11 @@
-/*
+/*-----------------------------------------------------------------------------
  * dds_defines.h
  *
- *  Created on: 28 Oct 2015
- *      Author: tims
+ * Created: 28 Oct 2015
+ * Author: tims
+ *
+ *-----------------------------------------------------------------------------
  */
-
 #ifndef DDS_DEFINES_H_
 #define DDS_DEFINES_H_
 
@@ -61,7 +62,7 @@
 
 // Minimum frequency
 #ifndef DDS_MIN_FREQ
-#define DDS_MIN_FREQ 1
+#define DDS_MIN_FREQ 0
 #endif
 
 // Maximum frequency (supported by hardware), default is 500kHz
@@ -73,7 +74,7 @@
 #define DDS_FREQ_IN_RANGE(freq)	((freq <= DDS_MAX_FREQ) & (freq >= DDS_MIN_FREQ))
 
 // Waveforms
-#define DDS_SIGN_WAVE 		0
+#define DDS_SINE_WAVE 		0
 #define DDS_TRIANGLE_WAVE 	1
 #define DDS_SAWTOOTH_WAVE 	2
 #define DDS_RSAWTOOTH_WAVE 	3

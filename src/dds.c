@@ -1,25 +1,28 @@
-/*
- * dac.c
+/*-----------------------------------------------------------------------------
+ * dds.c
  *
- *  Created on: 23 Oct 2015
- *      Author: tims
+ * Created: 23 Oct 2015
+ * Author: tims
+ * Revised: 17 Apr, 2017
+ * By: crHARPER
+ *
+ *-----------------------------------------------------------------------------
  */
-
 #include <avr/pgmspace.h>
 #include "dds.h"
 
 // Buffer used to store waveform
 uint8_t wave_buffer[256] __attribute__ ((section (".WaveBuffer")));
 
-extern void ddsloop(uint32_t step, uint8_t* waveform);
+extern void ddsloop(uint32_t step, uint8_t* waveform);  // dds.S
 
 // DDS wave names
 const char* dds_wave_names[] = {
-	"Sine",
-	"Triangle",
-	"Sawtooth",
-	"R Sawtooth",
-	"Square"
+	"Sine      ",
+	"Triangle  ",
+	"Sawtooth  ",
+	"ReSawtooth",
+	"Square    "
 };
 
 // DDS wave tables
@@ -121,22 +124,28 @@ const uint8_t wave_table[][256] PROGMEM = {
 	}
 };
 
-
+//-----------------------------------------------------------------------------
 void dds_init(void) {
 	// Set DAC port to output
-	DDS_DDR = 0xFF;  // Enable all output pins on PORTD
-	DDS_PORT = 0x7F;  // Set output to the middle (is offset to 0)
+    // try setting offset value before setting port as output
+    DDS_PORT = 0x7F;    // Set output to the middle (is offset to 0)
+	
+    DDS_DDR = 0xFF;     // Enable all output pins on PORTD
 	DDS_DISABLE;
 }
 
+//-----------------------------------------------------------------------------
 void dds_select_wave(uint8_t wave_idx) {
 	memcpy_P(wave_buffer, wave_table[wave_idx], 256);
 }
 
+//-----------------------------------------------------------------------------
+// Enters and does not return from ddsloop until DDS is disabled/stopped
 void dds_start(uint32_t frequency) {
 	uint32_t step = (frequency * DDS_STEP_CONSTANT) + 0.5;
-	DDS_ENABLE;
-	ddsloop(step, wave_buffer);
+	//DDS_ENABLE;
+	ddsloop(step, wave_buffer); // dds.S
 	DDS_DISABLE;
 	DDS_PORT = 0x7F;
 }
+
