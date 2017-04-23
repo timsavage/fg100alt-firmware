@@ -30,7 +30,7 @@
  * operations in <util/delay.h>) is the clock speed in Hz.
  *
  * It is easier to pre-calculate this value, this Google Sheets document can be
- * used to calculate this value:
+ * used to calculate the value:
  *
  * https://docs.google.com/spreadsheets/d/1Oab6_2TZ5SzAQHbTxMHLZFGgJnOQwO2SQYt80mpjkCc/edit?usp=sharing
  */

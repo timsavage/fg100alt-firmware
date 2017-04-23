@@ -42,11 +42,11 @@ loop:
 	out		_SFR_IO_ADDR(DDS_PORT), I	; 1 clock
 	sbic	_SFR_IO_ADDR(PINC), PINC3	; 1 clock (if unset)
 	rjmp	loop					    ; 2 clocks
-    
+									    ; --------
+										; 9 clocks
+	
 ; wait for R/S button release
 wait:
-    sbis	_SFR_IO_ADDR(PINC), PINC3
-	rjmp	wait					 
-
-    ret								    ; --------
-                                        ; 9 clocks
+	sbis	_SFR_IO_ADDR(PINC), PINC3
+	rjmp	wait
+	ret

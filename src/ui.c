@@ -20,42 +20,39 @@ extern Config_Eeprom_Type ui_state;
 
 //-----------------------------------------------------------------------------
 void ui_show_splash(void) {
-	lcd_clear();
-	lcd_printf("CH-100    V%02u.%02u", VERSION_MAJOR, VERSION_MINOR);
-	lcd_set_cursor(0, 1);
-	lcd_puts("tSavage/crHARPER");
+    lcd_clear();
+    lcd_printf("SH-100    V%02u.%02u", VERSION_MAJOR, VERSION_MINOR);
+    lcd_set_cursor(0, 1);
+    lcd_puts("SavageT/crHARPER");
 }
 
 
 //-----------------------------------------------------------------------------
 void ui_redraw_display(void) {
+    lcd_clear();
+    lcd_printf("Wave: %s", dds_wave_names[ui_state.waveform]);
+    lcd_set_cursor(0, 1);
+    lcd_printf("Freq: %06lu Hz", ui_state.frequency);
     
-	lcd_clear();
-	lcd_printf("Wave: %s", dds_wave_names[ui_state.waveform]);
-	lcd_set_cursor(0, 1);
-	lcd_printf("Freq: %06lu Hz", ui_state.frequency);
-	
     lcd_set_cursor(11 - ui_state.cursor, 1);
-	lcd_enable_cursor();
-
+    lcd_enable_cursor();
 }
 
 
 //-----------------------------------------------------------------------------
 // returns digit under cursor: 0-9
-uint8_t ui_get_digit(uint8_t cursor, uint32_t value){
+uint8_t ui_get_digit(uint8_t cursor, uint32_t value) {
     uint32_t a, b;
     
     a = value / powersOfTen[cursor];
     b = a % 10;
     return b;
-    
 }
 
-
+#if ROLL_OVER_ADJACENT != 1
 //-----------------------------------------------------------------------------
 // returns value less weighted value under cursor
-uint32_t ui_less_digit(uint8_t cursor, uint32_t value){
+uint32_t ui_less_digit(uint8_t cursor, uint32_t value) {
     uint32_t a, b, c;
     
     a = value % powersOfTen[cursor];
@@ -63,8 +60,8 @@ uint32_t ui_less_digit(uint8_t cursor, uint32_t value){
     b *= powersOfTen[cursor + 1];
     c = a + b;
     return c;
-    
 }
+#endif 
 
 
 //-----------------------------------------------------------------------------
@@ -79,7 +76,7 @@ void ui_handle_event(uint8_t buttons) {
     uint32_t frequency;
     uint8_t digit;
     
-    if( !hold ){ 
+    if(!hold) { 
         // normal button functions    
         switch(buttons) {
             case MODE_BUTTON:
@@ -88,33 +85,33 @@ void ui_handle_event(uint8_t buttons) {
                 hold = 1;
                 break;
             
-
             case CURSOR_BUTTON:
                 ui_state.cursor = (ui_state.cursor + 1) % 6;
                 ui_redraw_display();
                 hold = 1;
                 break;
             
-
-            case PLUS_BUTTON:
-                    
-                digit = ui_get_digit( ui_state.cursor, ui_state.frequency );
+            case PLUS_BUTTON:                    
+                digit = ui_get_digit(ui_state.cursor, ui_state.frequency);
                 
-                if( digit >= 9)
+                if (digit >= 9) {
                     digit = 0;
-                else
+                } else {
                     digit++;
+                }
                 
-                frequency = ui_less_digit( ui_state.cursor, ui_state.frequency );
-                frequency += powersOfTen[ui_state.cursor] * digit;
+                #if ROLL_OVER_ADJACENT == 1
+					frequency = ui_state.frequency + powersOfTen[ui_state.cursor];
+				#else
+					frequency = ui_less_digit(ui_state.cursor, ui_state.frequency);
+					frequency += powersOfTen[ui_state.cursor] * digit;
+                #endif
                 
-                // original increment operation for reference
-                //frequency = ui_state.frequency + powersOfTen[ui_state.cursor];
-                
-                if ( frequency > DDS_MAX_FREQ )
+                if (frequency > DDS_MAX_FREQ) {
                     frequency = DDS_MIN_FREQ;
+                }
                
-                if( DDS_FREQ_IN_RANGE(frequency) ){ 
+                if (DDS_FREQ_IN_RANGE(frequency)) { 
                     ui_state.frequency = frequency;
                     ui_redraw_display();
                 }
@@ -122,26 +119,26 @@ void ui_handle_event(uint8_t buttons) {
                 hold = 1;
                 break;
                 
-
             case MINUS_BUTTON:
+                digit = ui_get_digit(ui_state.cursor, ui_state.frequency);
                 
-                digit = ui_get_digit( ui_state.cursor, ui_state.frequency );
-                
-                if( digit )
+                if (digit) {
                     digit--;
-                else
-                    digit = 9;     
+                } else {
+                    digit = 9;
+                }
                 
-                frequency = ui_less_digit( ui_state.cursor, ui_state.frequency );
-                frequency += powersOfTen[ui_state.cursor] * digit;
-            
-                // original decrement operation for reference
-                //frequency = ui_state.frequency - powersOfTen[ui_state.cursor];
-                
+            	#if ROLL_OVER_ADJACENT == 1
+					frequency = ui_state.frequency - powersOfTen[ui_state.cursor];
+				#else
+					frequency = ui_less_digit(ui_state.cursor, ui_state.frequency);
+					frequency += powersOfTen[ui_state.cursor] * digit;           
+				#endif
+				
                 // Allow freq. of 0 Hz temporarily
                 // to simplify operator interaction
                 // when setting frequency.  Will get corrected below.    
-                if( DDS_FREQ_IN_RANGE(frequency) ){ 
+                if (DDS_FREQ_IN_RANGE(frequency)) { 
                     ui_state.frequency = frequency;
                     ui_redraw_display();
                 }                
@@ -149,18 +146,16 @@ void ui_handle_event(uint8_t buttons) {
                 hold = 1;
                 break;
                 
-
             case RUN_STOP_BUTTON:
                 dds_select_wave(ui_state.waveform);
                 // Don't enable DSS until button is released
                 hold = 1;
                 break;
-	
+    
         }
-    }
-    else{
+    } else {
         // all buttons released
-        if( !buttons ){
+        if (!buttons) {
             hold = 0;   // can allow next button input
             if( previous == RUN_STOP_BUTTON){
                 // because dds.S will return before button is released
@@ -180,15 +175,14 @@ void ui_handle_event(uint8_t buttons) {
             // reset hold down counters here
             // since all buttons a released
             cursor_hold = HOLD_TIME;
-        }
-        else{
+        } else {
             // if a button is held down for an extended period 
             // apply special functions here
             
             // clear frequency value when cursor button is held down
-            if( buttons == CURSOR_BUTTON && previous == CURSOR_BUTTON ){
-                if( cursor_hold ){
-                    if( !--cursor_hold ){ 
+            if (buttons == CURSOR_BUTTON && previous == CURSOR_BUTTON) {
+                if (cursor_hold) {
+                    if (!--cursor_hold) { 
                         ui_state.frequency = 0;
                         ui_redraw_display();
                     }
@@ -197,11 +191,9 @@ void ui_handle_event(uint8_t buttons) {
             // end of extended cursor button function
             
             // additional extended button functions here
-                    
         }
     }
     
-    previous = buttons;
-    
+    previous = buttons;  
 }
 
