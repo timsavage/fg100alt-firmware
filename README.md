@@ -1,4 +1,4 @@
-# FG100 alt firmware
+# SH100 alt firmware
 Alternate firmware for the FG-100 function generator
 
 The FG 100 is a cheap function generator widely available on Ebay. 
@@ -27,7 +27,7 @@ project file for AVRStudio and send me a pull request ;) ).
 
 Steps to build/upload/set correct fuses:
 ````
-  > make install
+  > make program
 ````
 
 If you prefer to do the steps separately:
