@@ -32,10 +32,18 @@ AVRDUDE_PROGRAMMER = usbtiny
 
 #### End project configuration ####
 
+#### Firmware options configuration options ####
+
+# When incrementing (and decrementing) the value under the cursor, if 
+# the value rolls over increment or decrement the adjacent value also.
+ROLL_OVER_ADJACENT = 1
+
+#### End firmware options configuration ####
 
 #### Flags
 
-DEFINES = -DF_CPU=$(CLK_FREQ) -DDDS_STEP_CONSTANT=$(DDS_STEP_CONSTANT)
+DEFINES = -DF_CPU=$(CLK_FREQ) -DDDS_STEP_CONSTANT=$(DDS_STEP_CONSTANT) \
+	-DROLL_OVER_ADJACENT=$(ROLL_OVER_ADJACENT)
 
 # Compiler
 override CFLAGS = -I. $(INCLUDES) -g -O$(OPTIMIZE) -mmcu=$(MCU) $(DEFINES) \
