@@ -20,8 +20,6 @@ If you are using a different programmer you will need to update the Makefile wit
 for AVRdude, update the *AVRDUDE_PROGRAMMER* parameter with the correct value for your programmer (see AVR dude
 documentation for info).
 
-> Note: for bleeding edge development (that may be broken), get the ng-dev branch.
-
 ## Compile/Install
 
 All development was completed on GNU/Linux so all instructions relate to this OS (feel free to generate a
@@ -36,14 +34,12 @@ If you prefer to do the steps separately:
 ````
   # Compile/Link/Generate Hex
   > make hex
-  # Upload to ATMega
+  # Upload to microcontroller
   > make upload
   # Set correct fuses
   > make fuses
 ````
 
-Finally open up the FG-100, unscrew the LCD and pull out, remove the ATMega48 from it's socket, replace with your newly flashed ATMega328p, replace the LCD.
-
-Ready to rock.
+Finally open up the FG-100, unscrew the LCD and remove the existing ATMega48 from it's socket, replace with your newly flashed ATMega328p, replace the LCD.
 
 ~ Enjoy!
