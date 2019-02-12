@@ -14,7 +14,7 @@ You will need:
 * AVR programmer/ISP (the Makefile defaults to using a USBTiny ISP)
 * AVR toolchain (eg avr-gcc, avrdude and gnumake) installed
 
-> Warning: There are many sources for the FG-100 of varying quality and performace. My particular unit has a really nice PCB and quality (rubicon) capacitors, the output is clean with minimal noise. Other people (including a review on hackaday) have not had such luck. YMMV
+> Warning: There are many sources for the FG-100 of varying quality and performace. My particular unit has a high quality PCB with quality components (Rubicon capacitors), the output is clean with minimal noise. Other people (including a review on Hackaday) have not had such luck. YMMV
 
 If you are using a different programmer you will need to update the Makefile with the currect programmer code
 for AVRdude, update the *AVRDUDE_PROGRAMMER* parameter with the correct value for your programmer (see AVR dude
